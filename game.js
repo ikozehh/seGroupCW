@@ -8,13 +8,27 @@ const housesForTiles = [{
   "Group":"Brown",
   "Cost":60,
   "Rent":2,
-  "Position":2
+  "Position":2,
+  "houses":{
+    1:10,
+    2:30,
+    3:90,
+    4:160,
+    "hotel":250
+  }
 },{
   "Name":"Gangsters Paradise",
   "Group":"Brown",
   "Cost":60,
   "Rent":4,
-  "Position":4
+  "Position":4,
+  "houses":{
+    1:20,
+    2:60,
+    3:180,
+    4:320,
+    "hotel":450
+  }
 },{
   "Name":"Brighton Station",
   "Group":"Station",
@@ -25,25 +39,53 @@ const housesForTiles = [{
   "Group":"Blue",
   "Cost":100,
   "Position":7,
-  "Rent":6
+  "Rent":6,
+  "houses":{
+    1:30,
+    2:90,
+    3:270,
+    4:400,
+    "hotel":550
+  }
 },{
   "Name":"Potts Avenue",
   "Group":"Blue",
   "Cost":100,
   "Position":9,
-  "Rent":6
+  "Rent":6,
+  "houses":{
+    1:30,
+    2:90,
+    3:270,
+    4:400,
+    "hotel":550
+  }
 },{
   "Name":"Nardole Drive",
   "Group":"Blue",
   "Cost":120,
   "Position":10,
-  "Rent":8
+  "Rent":8,
+  "houses":{
+    1:40,
+    2:100,
+    3:300,
+    4:450,
+    "hotel":600
+  }
 },{
   "Name":"Skywalker Drive",
   "Group":"Purple",
   "Cost":140,
   "Position":12,
-  "Rent":10
+  "Rent":10,
+  "houses":{
+    1:50,
+    2:150,
+    3:450,
+    4:625,
+    "hotel":750
+  }
 },{
   "Name":"Tesla Power Co",
   "Group":"Utilities",
@@ -54,13 +96,27 @@ const housesForTiles = [{
   "Group":"Purple",
   "Cost":140,
   "Position":14,
-  "Rent":10
+  "Rent":10,
+  "houses":{
+    1:50,
+    2:150,
+    3:450,
+    4:625,
+    "hotel":750
+  }
 },{
   "Name":"Rey Lane",
   "Group":"Purple",
   "Cost":160,
   "Position":15,
-  "Rent":12
+  "Rent":12,
+  "houses":{
+    1:60,
+    2:180,
+    3:500,
+    4:700,
+    "hotel":900
+  }
 },{
   "Name":"Hove Station",
   "Group":"Station",
@@ -71,37 +127,79 @@ const housesForTiles = [{
   "Group":"Orange",
   "Cost":180,
   "Position":17,
-  "Rent":14
+  "Rent":14,
+  "houses":{
+    1:70,
+    2:200,
+    3:550,
+    4:750,
+    "hotel":950
+  }
 },{
   "Name":"Wolowitz Street",
   "Group":"Orange",
   "Cost":180,
   "Position":19,
-  "Rent":14
+  "Rent":14,
+  "houses":{
+    1:70,
+    2:200,
+    3:550,
+    4:750,
+    "hotel":950
+  }
 },{
   "Name":"Penny Lane",
   "Group":"Orange",
   "Cost":200,
   "Position":20,
-  "Rent":16
+  "Rent":16,
+  "houses":{
+    1:80,
+    2:220,
+    3:600,
+    4:800,
+    "hotel":1000
+  }
 }, {
   "Name":"Yue Fei Square",
   "Group":"Red",
   "Cost":220,
   "Position":22,
-  "Rent":18
+  "Rent":18,
+  "houses":{
+    1:90,
+    2:250,
+    3:700,
+    4:875,
+    "hotel":1050
+  }
 },{
   "Name":"Mulan Rouge",
   "Group":"Red",
   "Cost":220,
   "Position":24,
-  "Rent":18
+  "Rent":18,
+  "houses":{
+    1:90,
+    2:250,
+    3:700,
+    4:875,
+    "hotel":1050
+  }
 },{
   "Name":"Han Xin Gardens",
   "Group":"Red",
   "Cost":240,
   "Position":25,
-  "Rent":20
+  "Rent":20,
+  "houses":{
+    1:100,
+    2:300,
+    3:750,
+    4:925,
+    "hotel":1100
+  }
 },{
   "Name":"Falmer Station",
   "Group":"Station",
@@ -112,13 +210,27 @@ const housesForTiles = [{
   "Group":"Yellow",
   "Cost":260,
   "Position":27,
-  "Rent":22
+  "Rent":22,
+  "houses":{
+    1:110,
+    2:330,
+    3:800,
+    4:975,
+    "hotel":1150
+  }
 },{
   "Name":"Picard Avenue",
   "Group":"Yellow",
   "Cost":260,
   "Position":28,
-  "Rent":22
+  "Rent":22,
+  "houses":{
+    1:110,
+    2:330,
+    3:800,
+    4:975,
+    "hotel":1150
+  }
 },{
   "Name":"Edison Water",
   "Group":"Utilities",
@@ -129,25 +241,53 @@ const housesForTiles = [{
   "Group":"Yellow",
   "Cost":280,
   "Position":30,
-  "Rent":22
+  "Rent":22,
+  "houses":{
+    1:120,
+    2:360,
+    3:850,
+    4:1025,
+    "hotel":1200
+  }
 },{
   "Name":"Sirat Mews",
   "Group":"Green",
   "Cost":300,
   "Position":32,
-  "Rent":26
+  "Rent":26,
+  "houses":{
+    1:130,
+    2:390,
+    3:900,
+    4:1100,
+    "hotel":1275
+  }
 },{
   "Name":"Ghengis Crescent",
   "Group":"Green",
   "Cost":300,
   "Position":33,
-  "Rent":26
+  "Rent":26,
+  "houses":{
+    1:130,
+    2:390,
+    3:900,
+    4:1100,
+    "hotel":1275
+  }
 },{
   "Name":"Ibis Close",
   "Group":"Green",
   "Cost":320,
   "Position":35,
-  "Rent":28
+  "Rent":28,
+  "houses":{
+    1:150,
+    2:450,
+    3:1000,
+    4:1200,
+    "hotel":1400
+  }
 },{
   "Name":"Lewes Station",
   "Group":"Station",
@@ -158,13 +298,27 @@ const housesForTiles = [{
   "Group":"Deep Blue",
   "Cost":350,
   "Position":38,
-  "Rent":35
+  "Rent":35,
+  "houses":{
+    1:175,
+    2:500,
+    3:1100,
+    4:1300,
+    "hotel":1500
+  }
 },{
   "Name":"Turing Heights",
   "Group": "Deep Blue",
   "Cost":400,
   "Position":40,
-  "Rent":50
+  "Rent":50,
+  "houses":{
+    1:200,
+    2:600,
+    3:1400,
+    4:1700,
+    "hotel":2000
+  }
 }]
 const restOfTiles = [{
   "Name":"Go",
@@ -179,8 +333,10 @@ const restOfTiles = [{
 },{
   "Name":"Income Tax",
   "HasAction":true,
-  "Action":"Pay £200",
-  "Position":5
+  "Action":"Pay",
+  "Position":5,
+  "Rent":200
+
 },{
   "Name":"Opportunity Knocks",
   "HasAction":true,
@@ -224,8 +380,9 @@ const restOfTiles = [{
 {
   "Name":"Super Tax",
   "HasAction":true,
-  "Action":"Pay £100",
-  "Position":39
+  "Action":"Pay",
+  "Position":39,
+  "Rent":100
 }]
 ipcRenderer.on("sendPlayersInitGame", function(e, args){
   console.log("Received request from main process to start")
@@ -243,8 +400,8 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
   //constructor(position, type, name, owner, canBuy, isOwned, hasAction, action,cost, rent, houses)
   console.log(listOfPlayers)
   let listOfTiles = []
-  for (let i=0; i<housesForTiles.length;i++){
-    listOfTiles.push(new Tile(housesForTiles[i].Position,housesForTiles[i].Group,housesForTiles[i].Name,null,true,false,false,null,housesForTiles[i].Cost,housesForTiles[i].Rent, null))
+  for (let i=0; i<housesForTiles.length;i++){             //position, type, name, owner, canBuy, isOwned, hasAction, cost, rent,houses)
+    listOfTiles.push(new Tile(housesForTiles[i].Position,housesForTiles[i].Group,housesForTiles[i].Name,null,true,false,false,null,housesForTiles[i].Cost,housesForTiles[i].Rent, housesForTiles[i].houses))
   }
   for (let i=0; i<restOfTiles.length;i++){
     listOfTiles.push(new Tile(restOfTiles[i].Position,"tile",restOfTiles[i].Name,null,false,false,restOfTiles[i].HasAction,housesForTiles[i].Action,null,null,null))
@@ -293,6 +450,10 @@ class Board {
     let diceResult = this.currentPlayer.rollDice()
     let newPosition = this.currentPlayer.updatePosition(diceResult)
     if(this.tiles[newPosition].isSafeSpace(this.currentPlayer)){
+      if(this.tiles[newPosition].canBeBought()){
+        //give player option to buy
+        this.tiles[newPosition].buy(this.currentPlayer)
+      }
       this.updateCurrentPlayer()
     }else{
       this.tiles[newPosition].chargePlayer(this.currentPlayer)
@@ -334,7 +495,10 @@ class Player {
   }
 
   receiveMoney(amount){
+    console.log("Receiving money")
     this.money = this.money + amount
+    console.log(this.money)
+
   }
 
   getMoney(){
@@ -364,12 +528,18 @@ class Player {
   }
 
   updatePosition(extra){
-    this.position = this.position + extra
+    if(this.position + extra <= 40){
+      this.position = this.position + extra
+    }else{
+      this.position = (this.position + extra) - 40
+      this.receiveMoney(20)
+    }
     return this.position
+
   }
 
   ownedProperties(){
-    return
+    return this.properties
   }
 }
 
@@ -387,10 +557,11 @@ class Tile{
   canBuy;//bool
   isOwned; //bool
   hasAction; //bool
+  action; //string
   cost; //int
   rent; //int
   houses; //int
-  constructor(position, type, name, owner, canBuy, isOwned, hasAction, cost, rent, houses){
+  constructor(position, type, name, owner, canBuy, isOwned, hasAction, action,cost, rent,houses){
     this.position = position;
     this.type = type;
     this.name = name;
@@ -398,9 +569,11 @@ class Tile{
     this.canBuy = canBuy;
     this.isOwned = isOwned;
     this.hasAction = hasAction;
+    this.action = action
     this.cost = cost;
     this.rent = rent;
     this.houses = houses;
+    this.numOfHouses = -1
   }
 
   getType(){
@@ -409,6 +582,22 @@ class Tile{
 
   getName(){
     return this.name
+  }
+  canBeBought(player){
+    console.log(this)
+    return this.canBuy && (!this.isOwned || this.owner == player)
+  }
+
+  getHouseCost(){
+    if(this.type == "Brown" || this.type == "Blue"){
+      return 50
+    }else if(this.type == "Purple" || this.type == "Orange"){
+      return 100
+    }else if(this.type == "Red" || this.type == "Yellow"){
+      return 150
+    }else if(this.type == "Green" || this.type == "Deep Blue"){
+      return 200
+    }
   }
 
   isSafeSpace(player){
@@ -421,22 +610,47 @@ class Tile{
   }
 
   chargePlayer(player){
-    player.spendMoney(this.rent)
-    console.log("Charging player")
     if(this.type != "tile"){
+      player.spendMoney(this.rent)
+      console.log("Charging player")
       this.owner.receiveMoney(this.rent)
     }else{
-      bankMoney = bankMoney + this.rent
-      //updateBankMoneyFrontend()
+      if(this.action == "Pay"){
+        player.spendMoney(this.rent)
+        console.log("Charging player")
+        bankMoney = bankMoney + this.rent
+      }    //updateBankMoneyFrontend()
     }
 
   }
 
-  buy(){
-    if(this.canBuy && !this.isOwned){
-      //buy property
+  buy(player){
+    if(this.owner != player){
+      if (player.getMoney() >= this.cost){
+        console.log("Buying new house")
+          this.owner = player
+          player.spendMoney(this.cost)
+          bankMoney = bankMoney + this.cost
+          this.numOfHouses++
+      }else{
+        console.log("Not enough money")
+      }
     }else{
-      console.log("Property cannot be bought")
+      if(player.getMoney() >= this.getHouseCost()){
+        console.log("Buying new house")
+        this.numOfHouses++
+        player.spendMoney(this.getHouseCost())
+        bankMoney = bankMoney + this.getHouseCost()
+        if(this.numOfHouses >4){
+          this.rent = this.houses["hotel"]
+        }else{
+          this.rent = this.houses[this.numOfHouses]
+        }
+      }else{
+        console.log("Not enough money")
+      }
+
     }
+
   }
 }
