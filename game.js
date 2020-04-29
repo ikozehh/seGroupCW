@@ -333,7 +333,7 @@ const restOfTiles = [{
 },{
   "Name":"Income Tax",
   "HasAction":true,
-  "Action":"Pay",
+  "Action":"Pay £200",
   "Position":5,
   "Rent":200
 
@@ -380,7 +380,7 @@ const restOfTiles = [{
 {
   "Name":"Super Tax",
   "HasAction":true,
-  "Action":"Pay",
+  "Action":"Pay £100",
   "Position":39,
   "Rent":100
 }]
@@ -395,7 +395,7 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
   }
   let listOfPlayers = []
   for (let i=0; i<args.length; i++){
-    listOfPlayers.push(new Player(args[i].Token, args[i].Name, 0, {}, false))
+    listOfPlayers.push(new Player(args[i].Token, args[i].Name, 1, {}, false))
   }
   //constructor(position, type, name, owner, canBuy, isOwned, hasAction, action,cost, rent, houses)
   console.log(listOfPlayers)
@@ -414,7 +414,7 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
   let rollDiceBtn = document.getElementById("rollDiceBtn")
   rollDiceBtn.addEventListener("click", () => {
     boardGame.rollDiceMovePlayer()
-    console.log(boardGame)
+    //console.log(boardGame)
   })
 })
 class Board {
@@ -429,6 +429,7 @@ class Board {
     this.currentPlayer.setIsTurn(true)
     this.numOfPlayers = players.length
     this.tiles = tiles
+    console.log(this.tiles)
   }
 
   // get currentPlayer(){
@@ -443,24 +444,69 @@ class Board {
       this.players[this.numOfPlayers - 1].setIsTurn(false)
     }
     this.currentPlayer = this.players[this.currentPlayerNum]
+    console.log(this)
     this.currentPlayer.setIsTurn(true)
   }
 
-  rollDiceMovePlayer(){
+  async rollDiceMovePlayer(){
     let diceResult = this.currentPlayer.rollDice()
     let newPosition = this.currentPlayer.updatePosition(diceResult)
-    if(this.tiles[newPosition].isSafeSpace(this.currentPlayer)){
-      if(this.tiles[newPosition].canBeBought()){
-        //give player option to buy
-        this.tiles[newPosition].buy(this.currentPlayer)
+    if(this.tiles[newPosition - 1].isSafeSpace(this.currentPlayer)){
+      if(this.tiles[newPosition - 1].canBeBought(this.currentPlayer)){
+        ipcRenderer.send("letBuy", this.tiles[newPosition - 1].getBuyInfo())
+        let buyHouse = await new Promise((res,rej) => {
+          ipcRenderer.on("purchasePropertyRen",(e,buy) => {
+            res(buy)
+          })
+        })
+        if(buyHouse){
+          this.tiles[newPosition - 1].buy(this.currentPlayer)
+          this.updateCurrentPlayer()
+        }else{
+          this.updateCurrentPlayer()
+        }
+      }else if(this.tiles[newPosition - 1].hasActions()){
+        this.handleAction(this.tiles[newPosition - 1])
+      }else{
+        this.updateCurrentPlayer()
       }
-      this.updateCurrentPlayer()
     }else{
-      this.tiles[newPosition].chargePlayer(this.currentPlayer)
+      this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
       this.updateCurrentPlayer()
     }
+    this.currentPlayer.offerUpgrades()
 
   }
+
+  takeCard(){
+
+  }
+
+
+  collectFines(){
+
+  }
+
+  payTax(amount){
+    this.currentPlayer.spendMoney(amount)
+    bankMoney = bankMoney + amount
+    ipcRenderer.send("infoMessage", "You have had to pay a tax of " + amount + " to the bank")
+  }
+
+  handleAction(tile){
+    let actionString = tile.getAction()
+    if(actionString == "Take Card"){
+      this.takeCard()
+    }else if(actionString == "Go To Jail"){
+      this.currentPlayer.goToJail()
+    }else if(actionString == "Collect Fines"){
+      this.collectFines()
+    }else if(actionString.split(" ")[0] == "Pay"){
+      this.payTax(actionString.split("£")[1])
+    }
+  }
+
+
 }
 
 //On Dice roll click - call this function
@@ -475,6 +521,7 @@ class Player {
   doubleCount; //int
   passedGo; //boolean
   name;
+  inJail;
 
   constructor(token,name, position, properties,isTurn){
     this.token = token;
@@ -485,21 +532,33 @@ class Player {
     this.isTurn = isTurn;
     this.doubleCount = 0;
     this.passedGo = false;
+    this.inJail = false;
   }
 
   spendMoney(amount){
-    console.log("Spending")
-    console.log(amount)
+    console.log("Player " + this.name + " is spending " + amount)
     this.money = this.money - amount
-    console.log(this.money)
+    console.log("Spent money, money left: " + this.money)
   }
 
   receiveMoney(amount){
-    console.log("Receiving money")
+    console.log("Player " + this.name + " is receiving " + amount)
     this.money = this.money + amount
-    console.log(this.money)
+    console.log("Received money, money left: " + this.money)
 
   }
+
+  offerUpgrades(){
+
+  }
+
+  goToJail(){
+    this.position = 11
+    this.inJail = true
+    ipcRenderer.send("infoMessage", "You have been sent to jail")
+  }
+
+
 
   getMoney(){
     return this.money
@@ -512,6 +571,12 @@ class Player {
     return this.name
   }
 
+  setPosition(pos){
+    this.position = pos
+  }
+
+
+
   rollDice(){
     let min = 1;
     let max = 6;
@@ -521,21 +586,30 @@ class Player {
       this.doubleCount++;
       if(this.doubleCount >= 3){
         this.isTurn = false;
-        // go to jail
+        this.position = 11
       }
     }
     return roll_1 + roll_2
   }
 
   updatePosition(extra){
+    console.log(this.position)
+    console.log(extra)
     if(this.position + extra <= 40){
       this.position = this.position + extra
     }else{
       this.position = (this.position + extra) - 40
-      this.receiveMoney(20)
+      this.passedGo = true
+      this.receiveMoney(200)
     }
+    console.log(this.position)
+
     return this.position
 
+  }
+
+  getPassedGo(){
+    return this.passedGo
   }
 
   ownedProperties(){
@@ -584,8 +658,27 @@ class Tile{
     return this.name
   }
   canBeBought(player){
-    console.log(this)
-    return this.canBuy && (!this.isOwned || this.owner == player)
+    return this.canBuy && (!this.isOwned || this.owner == player) && player.getPassedGo()
+  }
+
+  getBuyInfo(){
+    return {
+      "type":this.type,
+      "name":this.name,
+      "cost":this.cost,
+      "rent":this.rent,
+      "houses":this.houses,
+      "houseCost":this.getHouseCost(),
+      "owner":this.owner
+    }
+  }
+
+  getAction(){
+    return this.action
+  }
+
+  hasActions(){
+    return this.hasAction
   }
 
   getHouseCost(){
@@ -612,12 +705,10 @@ class Tile{
   chargePlayer(player){
     if(this.type != "tile"){
       player.spendMoney(this.rent)
-      console.log("Charging player")
       this.owner.receiveMoney(this.rent)
     }else{
       if(this.action == "Pay"){
         player.spendMoney(this.rent)
-        console.log("Charging player")
         bankMoney = bankMoney + this.rent
       }    //updateBankMoneyFrontend()
     }
@@ -627,11 +718,12 @@ class Tile{
   buy(player){
     if(this.owner != player){
       if (player.getMoney() >= this.cost){
-        console.log("Buying new house")
+        console.log("Buying new propert")
           this.owner = player
           player.spendMoney(this.cost)
           bankMoney = bankMoney + this.cost
           this.numOfHouses++
+          ipcRenderer.send("sendInfo", "You have bought the property")
       }else{
         console.log("Not enough money")
       }
