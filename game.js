@@ -3,6 +3,7 @@ const {ipcRenderer} = require('electron');
 const sort = require("fast-sort");
 var boardGame;
 var bankMoney = 50000
+var parkingFinesMoney = 0;
 const housesForTiles = [{
   "Name":"Crapper Street",
   "Group":"Brown",
@@ -449,6 +450,11 @@ class Board {
   }
 
   async rollDiceMovePlayer(){
+    if(this.currentPlayer.isInJail()){
+      incrementMissedRoundsAndHandleJail();
+      this.updateCurrentPlayer()
+      return
+    }
     let diceResult = this.currentPlayer.rollDice()
     let newPosition = this.currentPlayer.updatePosition(diceResult)
     if(this.tiles[newPosition - 1].isSafeSpace(this.currentPlayer)){
@@ -500,7 +506,7 @@ class Board {
     }else if(actionString == "Go To Jail"){
       this.currentPlayer.goToJail()
     }else if(actionString == "Collect Fines"){
-      this.collectFines()
+      this.currentPlayer.collectFines()
     }else if(actionString.split(" ")[0] == "Pay"){
       this.payTax(actionString.split("£")[1])
     }
@@ -522,6 +528,7 @@ class Player {
   passedGo; //boolean
   name;
   inJail;
+  missedRounds;
 
   constructor(token,name, position, properties,isTurn){
     this.token = token;
@@ -533,6 +540,7 @@ class Player {
     this.doubleCount = 0;
     this.passedGo = false;
     this.inJail = false;
+    this.missedRounds = -1
   }
 
   spendMoney(amount){
@@ -548,14 +556,50 @@ class Player {
 
   }
 
+  isInJail(){
+    return this.inJail;
+  }
+
+  incrementMissedRoundsAndHandleJail(){
+    this.missedRounds++
+    if(this.missedRounds == 2){
+      ipcRenderer.send("infoMessage", "You have now left jail "+this.name+", you will have a turn next round")
+      this.missedRounds = -1
+      this.inJail = false;
+    }
+  }
+
   offerUpgrades(){
 
   }
 
-  goToJail(){
+  collectFines(){
+    this.receiveMoney(parkingFinesMoney)
+    ipcRenderer.send("infoMessage", "You have collected all the parking fines money which was £"+parkingFinesMoney)
+    parkingFinesMoney = 0;
+  }
+
+  async goToJail(){
     this.position = 11
     this.inJail = true
-    ipcRenderer.send("infoMessage", "You have been sent to jail")
+    ipcRenderer.send("goJail")
+    let leaveJail = await new Promise((res,rej) => {
+      ipcRenderer.on("leaveJailRen", (e,leave) => {
+        res(leave)
+      })
+    })
+    if(leaveJail){
+      if(this.money >= 50){
+        parkingFinesMoney = parkingFinesMoney + 50
+        this.inJail = false;
+      }else{
+        ipcRenderer.send("infoMessage", "You do not have enough money to leave jail you must stay for 2 rounds and not collect rent")
+        this.missedRounds++
+      }
+    }else{
+      ipcRenderer.send("infoMessage", "You have chosen to stay in jail, you won't collect rent and will miss 2 go's")
+      this.missedRounds++
+    }
   }
 
 
@@ -696,6 +740,11 @@ class Tile{
   isSafeSpace(player){
     let playerName = player.getName()
     if (this.isOwned || this.hasAction){
+      if(this.isOwned){
+        if(this.owner.isInJail()){
+          return true;
+        }
+      }
       return false
     }else{
       return true

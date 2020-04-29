@@ -2,6 +2,7 @@ const electron = require('electron')
 const { app, BrowserWindow, ipcMain } = require('electron')
 var win;
 var buyWindow;
+var jailWindow;
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
@@ -54,6 +55,21 @@ ipcMain.on("infoMessage",(e,message) => {
 }, (buttonIndex) => {
   //postExitApp()
 });
+})
+
+ipcMain.on("goJail", (e,args) => {
+  jailWindow = new BrowserWindow({
+    width:300,
+    height:400,
+    webPreferences:{
+      nodeIntegration:true
+    }
+  })
+  jailWindow.loadFile("jail.html")
+})
+
+ipcMain.on("leaveJail", (e,leave) => {
+  win.webContents.send("leaveJailRen",leave)
 })
 
 app.whenReady().then(createWindow)
