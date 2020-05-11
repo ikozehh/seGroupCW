@@ -396,7 +396,7 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
   }
   let listOfPlayers = []
   for (let i=0; i<args.length; i++){
-    listOfPlayers.push(new Player(args[i].Token, args[i].Name, 1, {}, false))
+    listOfPlayers.push(new Player(args[i].Token, args[i].Name, 1, [], false))
   }
   //constructor(position, type, name, owner, canBuy, isOwned, hasAction, action,cost, rent, houses)
   console.log(listOfPlayers)
@@ -467,20 +467,21 @@ class Board {
         })
         if(buyHouse){
           this.tiles[newPosition - 1].buy(this.currentPlayer)
-          this.updateCurrentPlayer()
         }else{
-          this.updateCurrentPlayer()
+          //auction house off
         }
-      }else if(this.tiles[newPosition - 1].hasActions()){
-        this.handleAction(this.tiles[newPosition - 1])
-      }else{
-        this.updateCurrentPlayer()
       }
     }else{
-      this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
-      this.updateCurrentPlayer()
+      if(this.tiles[newPosition - 1].hasActions()){
+        await this.handleAction(this.tiles[newPosition - 1])
+      }else if(this.tiles[newPosition - 1].shouldPayRent(this.currentPlayer)){
+        this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
+      }
+
+
     }
-    this.currentPlayer.offerUpgrades()
+    await this.currentPlayer.offerUpgrades()
+    this.updateCurrentPlayer()
 
   }
 
@@ -489,9 +490,9 @@ class Board {
   }
 
 
-  collectFines(){
-
-  }
+  // collectFines(){
+  //
+  // }
 
   payTax(amount){
     this.currentPlayer.spendMoney(amount)
@@ -499,12 +500,12 @@ class Board {
     ipcRenderer.send("infoMessage", "You have had to pay a tax of " + amount + " to the bank")
   }
 
-  handleAction(tile){
+  async handleAction(tile){
     let actionString = tile.getAction()
     if(actionString == "Take Card"){
       this.takeCard()
     }else if(actionString == "Go To Jail"){
-      this.currentPlayer.goToJail()
+      await this.currentPlayer.goToJail()
     }else if(actionString == "Collect Fines"){
       this.currentPlayer.collectFines()
     }else if(actionString.split(" ")[0] == "Pay"){
@@ -558,6 +559,10 @@ class Player {
 
   isInJail(){
     return this.inJail;
+  }
+
+  addNewProperty(tilePosition){
+    this.properties.push(tilePosition)
   }
 
   incrementMissedRoundsAndHandleJail(){
@@ -705,6 +710,13 @@ class Tile{
     return this.canBuy && (!this.isOwned || this.owner == player) && player.getPassedGo()
   }
 
+  shouldPayRent(lander){
+    if(this.owner != null && this.owner != lander){
+      return true
+    }
+    return false
+  }
+
   getBuyInfo(){
     return {
       "type":this.type,
@@ -755,23 +767,25 @@ class Tile{
     if(this.type != "tile"){
       player.spendMoney(this.rent)
       this.owner.receiveMoney(this.rent)
-    }else{
-      if(this.action == "Pay"){
-        player.spendMoney(this.rent)
-        bankMoney = bankMoney + this.rent
-      }    //updateBankMoneyFrontend()
     }
+    // else{
+    //   if(this.action == "Pay"){
+    //     player.spendMoney(this.rent)
+    //     bankMoney = bankMoney + this.rent
+    //   }    //updateBankMoneyFrontend()
+    // }
 
   }
 
   buy(player){
     if(this.owner != player){
       if (player.getMoney() >= this.cost){
-        console.log("Buying new propert")
+        console.log("Buying new property")
           this.owner = player
           player.spendMoney(this.cost)
           bankMoney = bankMoney + this.cost
           this.numOfHouses++
+          player.addNewProperty(this.position)
           ipcRenderer.send("sendInfo", "You have bought the property")
       }else{
         console.log("Not enough money")
@@ -787,6 +801,7 @@ class Tile{
         }else{
           this.rent = this.houses[this.numOfHouses]
         }
+
       }else{
         console.log("Not enough money")
       }
