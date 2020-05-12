@@ -641,7 +641,7 @@ class Player {
     if(this.properties.length == 0){
       return
     }
-    let propertiesAvailable = getPotentialUpgrades()
+    let propertiesAvailable = this.getPotentialUpgrades()
     if(propertiesAvailable.length == 0){
       return
     }
