@@ -493,9 +493,9 @@ class Board {
       }else if(this.tiles[newPosition - 1].shouldPayRent(this.currentPlayer)){
         console.log("should pay rent")
         if(this.tiles[newPosition - 1].shouldRentDouble()){
-          this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
+          this.tiles[newPosition - 1].chargePlayer(this.currentPlayer, diceResult)
         }
-        this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
+        this.tiles[newPosition - 1].chargePlayer(this.currentPlayer, diceResult)
       }
 
 
@@ -616,6 +616,9 @@ class Player {
     let upgradeProps = []
     for(let property of this.properties){
       let propType = property.getType()
+      if(propType == "Station" || propType == "Utilities"){
+        continue;
+      }
       let allTiles = boardGame.getBoardTiles()
       let ownsAll = true
       for(let tile of allTiles){
@@ -912,8 +915,32 @@ class Tile{
     }
   }
 
-  chargePlayer(player){
-    if(this.type != "tile"){
+  chargePlayer(player, diceRoll){
+    if(this.type == "Station"){
+      let rentAmount;
+      let stations = this.owner.getNumOfStations()
+      if(stations == 1){
+        rentAmount = 25
+      }else if(stations == 2){
+        rentAmount = 50
+      }else if(stations == 3){
+        rentAmount = 100
+      }else if(stations == 4){
+        rentAmount = 200
+      }
+      player.spendMoney(rentAmount)
+      this.owner.receiveMoney(rentAmount)
+    }else if(this.type == "Utilities"){
+      let rentAm;
+      let utils = this.owner.getNumOfUtils()
+      if(utils == 1){
+        rentAm = 4 * diceRoll
+      }else if(utils == 2){
+        rentAm = 10 * diceRoll
+      }
+      player.spendMoney(rentAm)
+      this.owner.receiveMoney(rentAm)
+    }else if(this.type != "tile"){
       player.spendMoney(this.rent)
       this.owner.receiveMoney(this.rent)
     }
@@ -933,7 +960,9 @@ class Tile{
           this.owner = player
           player.spendMoney(this.cost)
           bankMoney = bankMoney + this.cost
-          this.numOfHouses++
+          if(this.type != "Station" && this.type != "Utilities"){
+            this.numOfHouses++
+          }
           player.addNewProperty(this)
           ipcRenderer.send("sendInfo", "You have bought the property")
       }else{
