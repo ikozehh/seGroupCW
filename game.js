@@ -492,6 +492,9 @@ class Board {
         await this.handleAction(this.tiles[newPosition - 1])
       }else if(this.tiles[newPosition - 1].shouldPayRent(this.currentPlayer)){
         console.log("should pay rent")
+        if(this.tiles[newPosition - 1].shouldRentDouble()){
+          this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
+        }
         this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
       }
 
@@ -807,6 +810,36 @@ class Tile{
     this.numOfHouses = -1
   }
 
+  shouldRentDouble(){
+    let allProps = this.owner.ownedProperties()
+    let allTiles = boardGame.getBoardTiles()
+    let ownsAll = true
+    for(let tile of allTiles){
+      if(tile.getType() == this.type){
+        if(tile.owner != this.owner){
+          ownsAll = false
+          break;
+        }
+      }
+    }
+    let notUpgraded = true
+    if(ownsAll){
+      for(let prop of allProps){
+        if(prop.type == this.type){
+          if(prop.numOfHouses != 0){
+            notUpgraded = false
+            break;
+          }
+        }
+      }
+      return notUpgraded
+
+    }else{
+      return false
+    }
+
+  }
+
   getType(){
     return this.type
   }
@@ -819,7 +852,7 @@ class Tile{
     return this.name
   }
   canBeBought(player){
-    return this.canBuy && (!this.isOwned || this.owner == player) && player.getPassedGo()
+    return this.canBuy && this.owner == null && player.getPassedGo()
   }
 
   shouldPayRent(lander){
@@ -867,9 +900,8 @@ class Tile{
   }
 
   isSafeSpace(player){
-    let playerName = player.getName()
-    if (this.isOwned || this.hasAction){
-      if(this.isOwned){
+    if (this.owner != null || this.hasAction){
+      if(this.owner != null){
         if(this.owner.isInJail()){
           return true;
         }
