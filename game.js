@@ -455,7 +455,16 @@ class Board {
       this.updateCurrentPlayer()
       return
     }
-    let diceResult = this.currentPlayer.rollDice()
+    let diceRoll = this.currentPlayer.rollDice()
+    let diceResult = diceRoll["roll"]
+    if(diceRoll["isDouble"]){
+      if(this.currentPlayer.getNumDoubles() == 3){
+        await this.currentPlayer.goToJail()
+        this.currentPlayer.setNumDoubles(0)
+        this.updateCurrentPlayer()
+        return
+      }
+    }
     let newPosition = this.currentPlayer.updatePosition(diceResult)
     if(this.tiles[newPosition - 1].isSafeSpace(this.currentPlayer)){
       console.log("is safe space")
@@ -490,7 +499,10 @@ class Board {
     }
     console.log("offering upgrades")
     await this.currentPlayer.offerUpgrades()
-    this.updateCurrentPlayer()
+    if(!diceRoll["isDouble"]){
+      this.updateCurrentPlayer()
+    }
+
 
   }
 
@@ -570,6 +582,14 @@ class Player {
     return this.inJail;
   }
 
+  getNumDoubles(){
+    return this.doubleCount
+  }
+
+  setNumDoubles(number){
+    this.doubleCount = number
+  }
+
   addNewProperty(tile){
     this.properties.push(tile)
   }
@@ -605,7 +625,7 @@ class Player {
 
   collectFines(){
     this.receiveMoney(parkingFinesMoney)
-    ipcRenderer.send("infoMessage", "You have collected all the parking fines money which was £"+parkingFinesMoney)
+    ipcRenderer.send("infoMessage", "You have collected all the parking fines money which was £ "+parkingFinesMoney)
     parkingFinesMoney = 0;
   }
 
@@ -656,14 +676,16 @@ class Player {
     let max = 6;
     let roll_1 = Math.floor(Math.random() * (max - 1)) + 1;
     let roll_2 = Math.floor(Math.random() * (max - 1)) + 1;
+    let double = false
     if (roll_1 == roll_2){
       this.doubleCount++;
-      if(this.doubleCount >= 3){
-        this.isTurn = false;
-        this.position = 11
-      }
+      double = true
+    }else{
+      this.doubleCount = 0
     }
-    return roll_1 + roll_2
+    return {"roll":roll_1 + roll_2,
+    "isDouble":double
+  }
   }
 
   updatePosition(extra){
