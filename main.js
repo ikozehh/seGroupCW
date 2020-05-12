@@ -1,8 +1,9 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 var win;
 var buyWindow;
 var jailWindow;
+var upgradeWindow;
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
@@ -17,7 +18,7 @@ function createWindow () {
   win.loadFile('setup.html')
 }
 
-ipcMain.on("getPlayers", function(e, args){
+ipcMain.on("getPlayers", (e, args) => {
   console.log("Received player details from startup")
   win.loadFile('game.html')
   win.webContents.on('did-finish-load', () => {
@@ -37,6 +38,25 @@ ipcMain.on("letBuy", (e,tile) => {
   buyWindow.webContents.on('did-finish-load', () => {
     buyWindow.webContents.send("loadBuyTile",tile)
   })
+})
+
+ipcMain.on("offerUpgrades",(e,propertiesInfo) => {
+  upgradeWindow = new BrowserWindow({
+    width:300,
+    height:400,
+    webPreferences:{
+      nodeIntegration:true
+    }
+  })
+  upgradeWindow.loadFile("upgradePage.html")
+  upgradeWindow.webContents.on("did-finish-load", () => {
+    upgradeWindow.webContents.send("loadUpgradeOptions", propertiesInfo)
+  })
+})
+
+ipcMain.on("purchaseUpgrades",(e,upgrades) => {
+  upgradeWindow.close()
+  win.webContents.send("upgradeChoices", upgrades)
 })
 
 ipcMain.on("purchaseProperty",(e,purchase) => {
@@ -69,6 +89,7 @@ ipcMain.on("goJail", (e,args) => {
 })
 
 ipcMain.on("leaveJail", (e,leave) => {
+  jailWindow.close()
   win.webContents.send("leaveJailRen",leave)
 })
 

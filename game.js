@@ -405,7 +405,7 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
     listOfTiles.push(new Tile(housesForTiles[i].Position,housesForTiles[i].Group,housesForTiles[i].Name,null,true,false,false,null,housesForTiles[i].Cost,housesForTiles[i].Rent, housesForTiles[i].houses))
   }
   for (let i=0; i<restOfTiles.length;i++){
-    listOfTiles.push(new Tile(restOfTiles[i].Position,"tile",restOfTiles[i].Name,null,false,false,restOfTiles[i].HasAction,housesForTiles[i].Action,null,null,null))
+    listOfTiles.push(new Tile(restOfTiles[i].Position,"tile",restOfTiles[i].Name,null,false,false,restOfTiles[i].HasAction,restOfTiles[i].Action,null,null,null))
   }
   let sortedBoard = sort(listOfTiles).asc(u => u.position)
   console.log(sortedBoard)
@@ -451,15 +451,18 @@ class Board {
 
   async rollDiceMovePlayer(){
     if(this.currentPlayer.isInJail()){
-      incrementMissedRoundsAndHandleJail();
+      this.currentPlayer.incrementMissedRoundsAndHandleJail();
       this.updateCurrentPlayer()
       return
     }
     let diceResult = this.currentPlayer.rollDice()
     let newPosition = this.currentPlayer.updatePosition(diceResult)
     if(this.tiles[newPosition - 1].isSafeSpace(this.currentPlayer)){
+      console.log("is safe space")
       if(this.tiles[newPosition - 1].canBeBought(this.currentPlayer)){
+        console.log("can be bought")
         ipcRenderer.send("letBuy", this.tiles[newPosition - 1].getBuyInfo())
+        console.log("let buy")
         let buyHouse = await new Promise((res,rej) => {
           ipcRenderer.on("purchasePropertyRen",(e,buy) => {
             res(buy)
@@ -467,19 +470,25 @@ class Board {
         })
         if(buyHouse){
           this.tiles[newPosition - 1].buy(this.currentPlayer)
+          console.log("buy the house")
         }else{
+          console.log("dont buy")
           //auction house off
         }
       }
     }else{
+      console.log("not safe space")
       if(this.tiles[newPosition - 1].hasActions()){
+        console.log("has actions")
         await this.handleAction(this.tiles[newPosition - 1])
       }else if(this.tiles[newPosition - 1].shouldPayRent(this.currentPlayer)){
+        console.log("should pay rent")
         this.tiles[newPosition - 1].chargePlayer(this.currentPlayer)
       }
 
 
     }
+    console.log("offering upgrades")
     await this.currentPlayer.offerUpgrades()
     this.updateCurrentPlayer()
 
@@ -561,8 +570,8 @@ class Player {
     return this.inJail;
   }
 
-  addNewProperty(tilePosition){
-    this.properties.push(tilePosition)
+  addNewProperty(tile){
+    this.properties.push(tile)
   }
 
   incrementMissedRoundsAndHandleJail(){
@@ -571,10 +580,26 @@ class Player {
       ipcRenderer.send("infoMessage", "You have now left jail "+this.name+", you will have a turn next round")
       this.missedRounds = -1
       this.inJail = false;
+    }else{
+      ipcRenderer.send("infoMessage", "You are still in jail "+this.name+", you will miss this round")
     }
   }
 
-  offerUpgrades(){
+  async offerUpgrades(){
+    console.log(this.properties)
+    if(this.properties.length == 0){
+      return
+    }
+      let propertyBuyInfo = this.properties.map(tile => tile.getBuyInfo())
+      ipcRenderer.send("offerUpgrades", propertyBuyInfo)
+      let choices = await new Promise((res, rej) => {
+        ipcRenderer.on("upgradeChoices",(e,choices) => {
+          res(choices)
+        })
+      })
+      if(choices.buyingUpgrades){
+        await processUpgrades(choices)
+      }
 
   }
 
@@ -725,7 +750,8 @@ class Tile{
       "rent":this.rent,
       "houses":this.houses,
       "houseCost":this.getHouseCost(),
-      "owner":this.owner
+      "owner":this.owner,
+      "numOfHouses":this.numOfHouses
     }
   }
 
@@ -785,7 +811,7 @@ class Tile{
           player.spendMoney(this.cost)
           bankMoney = bankMoney + this.cost
           this.numOfHouses++
-          player.addNewProperty(this.position)
+          player.addNewProperty(this)
           ipcRenderer.send("sendInfo", "You have bought the property")
       }else{
         console.log("Not enough money")
