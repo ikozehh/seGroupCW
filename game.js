@@ -390,7 +390,7 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
   console.log(args)
   let playersList = document.getElementById("playerNamesVisual")
   for (let i=0; i< args.length; i++){
-    let listEl = document.createElement("LI")
+    let listEl = document.createElement("li")
     listEl.innerText = args[i].Name
     playersList.append(listEl)
   }
@@ -510,6 +510,10 @@ class Board {
 
   }
 
+  getBoardTiles(){
+    return this.tiles
+  }
+
 
   // collectFines(){
   //
@@ -605,12 +609,43 @@ class Player {
     }
   }
 
+  getPotentialUpgrades(){
+    let upgradeProps = []
+    for(let property of this.properties){
+      let propType = property.getType()
+      let allTiles = boardGame.getBoardTiles()
+      let ownsAll = true
+      for(let tile of allTiles){
+        if(tile.getType() == propType){
+          if(tile.getOwner() != this){
+            ownsAll = false
+            break;
+          }
+        }
+      }
+      if(ownsAll){
+        upgradeProps.push(property)
+      }
+    }
+    for(let i =0; i< upgradeProps.length; i++){
+      if(upgradeProps[i].getNumberOfHouses() == 5){
+        upgradeProps.splice(i,1)
+      }
+    }
+    console.log(upgradeProps)
+    return upgradeProps
+  }
+
   async offerUpgrades(){
     console.log(this.properties)
     if(this.properties.length == 0){
       return
     }
-      let propertyBuyInfo = this.properties.map(tile => tile.getBuyInfo())
+    let propertiesAvailable = getPotentialUpgrades()
+    if(propertiesAvailable.length == 0){
+      return
+    }
+      let propertyBuyInfo = propertiesAvailable.map(tile => tile.getBuyInfo())
       ipcRenderer.send("offerUpgrades", propertyBuyInfo)
       let choices = await new Promise((res, rej) => {
         ipcRenderer.on("upgradeChoices",(e,choices) => {
@@ -618,8 +653,32 @@ class Player {
         })
       })
       if(choices.buyingUpgrades){
-        await processUpgrades(choices)
+        console.log(choices)
+        await this.processUpgrades(choices, propertyBuyInfo)
       }
+
+  }
+
+  async processUpgrades(choices, propertyBuyInfo){
+    delete choices["buyingUpgrades"]
+    for(let buyInfo of propertyBuyInfo){
+      if(buyInfo.name in choices){
+        choices[buyInfo.name] = buyInfo.houseCost
+      }
+    }
+    let priceTotal = Object.values(choices).reduce(( accumulator, currentValue ) => accumulator + currentValue, 0)
+    console.log(priceTotal)
+    console.log(choices)
+    if(priceTotal > this.money){
+      ipcRenderer.send("infoMessage", "You do not have enough money to process this upgrade please retry")
+      await this.offerUpgrades()
+    }else{
+      for(let property of this.properties){
+        if(property.getName() in choices){
+          property.buy(this)
+        }
+      }
+    }
 
   }
 
@@ -678,6 +737,7 @@ class Player {
     let roll_2 = Math.floor(Math.random() * (max - 1)) + 1;
     let double = false
     if (roll_1 == roll_2){
+      console.log("Rolled a double, " + this.name)
       this.doubleCount++;
       double = true
     }else{
@@ -731,6 +791,7 @@ class Tile{
   cost; //int
   rent; //int
   houses; //int
+  numOfHouses;
   constructor(position, type, name, owner, canBuy, isOwned, hasAction, action,cost, rent,houses){
     this.position = position;
     this.type = type;
@@ -748,6 +809,10 @@ class Tile{
 
   getType(){
     return this.type
+  }
+
+  getOwner(){
+    return this.owner
   }
 
   getName(){
@@ -783,6 +848,10 @@ class Tile{
 
   hasActions(){
     return this.hasAction
+  }
+
+  getNumberOfHouses(){
+    return this.numOfHouses;
   }
 
   getHouseCost(){

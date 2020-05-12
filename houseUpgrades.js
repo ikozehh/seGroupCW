@@ -6,7 +6,15 @@ const {ipcRenderer} = require('electron');
   var rejectBtn = document.getElementById("rejectUpgradesBtn")
 
   purchaseBtn.addEventListener("click", () => {
-    ipcRenderer.send("purchaseUpgrades", true)
+    let checkedBoxes = document.querySelectorAll("input:checked")
+    console.log(checkedBoxes)
+    let upgradeObj = {"buyingUpgrades":true}
+    checkedBoxes.forEach((property) => {
+      console.log(property)
+      upgradeObj[property.id] = true
+    })
+    console.log(upgradeObj)
+    ipcRenderer.send("purchaseUpgrades", upgradeObj)
   })
 
   rejectBtn.addEventListener("click", () => {
