@@ -473,7 +473,7 @@ class Board {
         ipcRenderer.send("letBuy", this.tiles[newPosition - 1].getBuyInfo())
         console.log("let buy")
         let buyHouse = await new Promise((res,rej) => {
-          ipcRenderer.on("purchasePropertyRen",(e,buy) => {
+          ipcRenderer.once("purchasePropertyRen",(e,buy) => {
             res(buy)
           })
         })
@@ -648,7 +648,7 @@ class Player {
       let propertyBuyInfo = propertiesAvailable.map(tile => tile.getBuyInfo())
       ipcRenderer.send("offerUpgrades", propertyBuyInfo)
       let choices = await new Promise((res, rej) => {
-        ipcRenderer.on("upgradeChoices",(e,choices) => {
+        ipcRenderer.once("upgradeChoices",(e,choices) => {
           res(choices)
         })
       })
