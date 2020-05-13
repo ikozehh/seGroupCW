@@ -2,13 +2,16 @@ const electron = require('electron');
 const {ipcRenderer} = require('electron');
 const sort = require("fast-sort");
 const boardGameData = require("./boardData.json")
+const cardGameData = require("./cardData.json")
+
+const potLuckCards = cardGameData[0]
+const opportunityCards = cardGameData[1]
 const housesForTiles = boardGameData[0]
 const restOfTiles = boardGameData[1]
 
 var boardGame;
 var bankMoney = 50000
 var parkingFinesMoney = 0;
-
 
 ipcRenderer.on("sendPlayersInitGame", function(e, args){
   console.log("Received request from main process to start")
