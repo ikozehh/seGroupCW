@@ -107,7 +107,13 @@ class Board {
           console.log("buy the house")
         }else{
           console.log("dont buy")
-          //auction house off
+          ipcRenderer.send("letAuction", [this.tiles[newPosition - 1].getBuyInfo(), this.players])
+          let auctionHouse = await new Promise((res, rej) => {
+            ipcRenderer.once("auctionPurchaseRen",(e,buy) => {
+              res(buy)
+            })
+          })
+          console.log(auctionHouse)
         }
       }
     }else{
