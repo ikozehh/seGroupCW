@@ -270,6 +270,17 @@ class Player {
       }
     }
     console.log(upgradeProps)
+    let lowestHouse = 6
+    for(let prop of upgradeProps){
+      if(prop.getNumberOfHouses() < lowestHouse){
+        lowestHouse = prop.getNumberOfHouses()
+      }
+    }
+    for(let i=0;i<upgradeProps.length;i++){
+      if(upgradeProps[i].getNumberOfHouses() > lowestHouse){
+        upgradeProps.splice(i,1)
+      }
+    }
     return upgradeProps
   }
 
