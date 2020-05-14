@@ -476,13 +476,13 @@ class Player {
   }
 
   async goToJail(){
+    this.position = 11
     if(this.freeJail != null){
       ipcRenderer.send("infoMessage", "You have used your get out of jail free card")
       boardGame.replaceJailCard(this.freejail)
       this.freeJail = null
       return
     }
-    this.position = 11
     this.inJail = true
     ipcRenderer.send("goJail")
     let leaveJail = await new Promise((res,rej) => {
