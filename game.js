@@ -5,7 +5,15 @@ const boardGameData = require("./boardData.json")
 const cardGameData = require("./cardData.json")
 
 const potLuckCards = cardGameData[0]
+const shuffledPotLuck = potLuckCards
+  .map((a) => ({sort: Math.random(), value: a}))
+  .sort((a, b) => a.sort - b.sort)
+  .map((a) => a.value)
 const opportunityCards = cardGameData[1]
+const shuffledOpportunityCards = opportunityCards
+  .map((a) => ({sort: Math.random(), value: a}))
+  .sort((a, b) => a.sort - b.sort)
+  .map((a) => a.value)
 const housesForTiles = boardGameData[0]
 const restOfTiles = boardGameData[1]
 
@@ -116,7 +124,7 @@ class Board {
               res(buy)
             })
           })
-          console.log(auctionHouse)
+          //await this.handleAuctionRes(auctionHouse)
         }
       }
     }else{
@@ -143,7 +151,107 @@ class Board {
 
   }
 
-  takeCard(){
+  replaceJailCard(type){
+    if(type == "Pot Luck"){
+      shuffledPotLuck.push({"Get out of jail free":"FreeJail"})
+    }else{
+      shuffledOpportunityCards.push({"Get out of jail free":"FreeJail"})
+    }
+  }
+
+  async processActionCard(cardActionStr){
+    let cardActionSpl = cardActionStr.split(" ")
+    let cardAction = cardActionSpl[0]
+    if(cardAction == "Pay"){
+      let amoun = parseInt(cardActionSpl[1])
+      this.currentPlayer.spendMoney(amoun)
+      bankMoney = bankMoney + amoun
+    }else if(cardAction == "Collect"){
+      let amoun = parseInt(cardActionSpl[1])
+      this.currentPlayer.receiveMoney(amoun)
+      bankMoney = bankMoney - amoun
+    }else if(cardAction == "Fine"){
+      let amoun = parseInt(cardActionSpl[1])
+      this.currentPlayer.spendMoney(amoun)
+      parkingFinesMoney = parkingFinesMoney + amoun
+    }else if(cardAction == "Jail"){
+      await this.currentPlayer.goToJail()
+    }else if(cardAction == "Move"){
+      let moveAmount = cardActionSpl[1]
+      let posNum;
+      if(moveAmount.includes("+")){
+        posNum = parseInt(moveAmount.substring(1))
+        this.currentPlayer.updatePosition(posNum)
+      }else if(moveAmount.includes("-")){
+        posNum = parseInt(moveAmount)
+        this.currentPlayer.updatePosition(posNum)
+      }else{
+        this.currentPlayer.setPosition(parseInt(moveAmount))
+      }
+    }else if(cardAction == "FreeJail"){
+      this.currentPlayer.giveFreeJail(cardType)
+    }else if(cardAction == "Repair"){
+      let amoun = parseInt(cardActionSpl[1])
+      let totalHouses = this.currentPlayer.getNumOfHouses()
+      if(totalHouses){
+        this.currentPlayer.spendMoney(amoun * totalHouses)
+        bankMoney = bankMoney + (amoun * totalHouses)
+      }
+      let totalHotels = this.currentPlayer.getNumOfHotels()
+      let amount = parseInt(cardActionSpl[2])
+      if(totalHotels){
+        this.currentPlayer.spendMoney(amount * totalHotels)
+        bankMoney = bankMoney + (amount * totalHotels)
+      }
+    }else if(cardAction == "Take"){
+      if(cardActionSpl[1] == "Opportunity"){
+        await this.takeCard("Opportunity Knocks")
+      }else if(cardActionSpl[1] == "Pot"){
+        await this.takeCard("Pot Luck")
+      }
+    }
+  }
+
+  async takeCard(typeOfCard){
+    let cardType;
+    if(typeOfCard == null){
+      let position = this.currentPlayer.getThePosition()
+      if(position == 18 || position == 3 || position == 34){
+        cardType = "Pot Luck"
+      }else if(position == 8 || position == 23){
+        cardType = "Opportunity Knocks"
+      }
+    }else{
+      cardType = typeOfCard
+    }
+    let card;
+    if(cardType == "Pot Luck"){
+      card = shuffledPotLuck.shift()
+    }else if(cardType == "Opportunity Knocks"){
+      card = shuffledOpportunityCards.shift()
+    }
+    let cardVal = Object.entries(card)
+    ipcRenderer.send("infoMessage", cardType + ": " + cardVal[0][0])
+    let cardActionStr = cardVal[0][1]
+    let cardActionSpl = cardActionStr.split(" ")
+    let cardAction = cardActionSpl[0]
+    if(!cardActionStr.includes("|")){
+      await this.processActionCard(cardActionStr)
+    }else{
+      let actions = cardActionStr.split(" | ")
+      ipcRenderer.send("giveChoices",[cardVal[0][0],actions])
+      let actionChoice = await new Promise((res, rej) => {
+        ipcRenderer.once("actionChoiceRen", (e,choice) => {
+          res(choice)
+        })
+      })
+      await this.processActionCard(actionChoice)
+    }
+    if(cardType == "Pot Luck"){
+      shuffledPotLuck.push(card)
+    }else if(cardType == "Opportunity Knocks"){
+      shuffledOpportunityCards.push(card)
+    }
 
   }
 
@@ -165,13 +273,13 @@ class Board {
   async handleAction(tile){
     let actionString = tile.getAction()
     if(actionString == "Take Card"){
-      this.takeCard()
+      await this.takeCard(null)
     }else if(actionString == "Go To Jail"){
       await this.currentPlayer.goToJail()
     }else if(actionString == "Collect Fines"){
-      this.currentPlayer.collectFines()
+      await this.currentPlayer.collectFines()
     }else if(actionString.split(" ")[0] == "Pay"){
-      this.payTax(actionString.split("£")[1])
+      await this.payTax(actionString.split("£")[1])
     }
   }
 
@@ -192,6 +300,7 @@ class Player {
   name;
   inJail;
   missedRounds;
+  freeJail;
 
   constructor(token,name, position, properties,isTurn){
     this.token = token;
@@ -204,6 +313,33 @@ class Player {
     this.passedGo = false;
     this.inJail = false;
     this.missedRounds = -1
+    this.freeJail = null
+  }
+
+  giveFreeJail(type){
+    this.freeJail = type
+  }
+
+  getNumOfHouses(){
+    let total = 0;
+    for(let prop of this.properties){
+      if(prop.getNumberOfHouses() == 5){
+        continue;
+      }
+      total = total + prop.getNumberOfHouses()
+    }
+    return total
+  }
+
+  getNumOfHotels(){
+    let total = 0;
+    for(let prop of this.properties){
+      if(prop.getNumberOfHouses() != 5){
+        continue;
+      }
+      total++;
+    }
+    return total
   }
 
   spendMoney(amount){
@@ -340,6 +476,12 @@ class Player {
   }
 
   async goToJail(){
+    if(this.freeJail != null){
+      ipcRenderer.send("infoMessage", "You have used your get out of jail free card")
+      boardGame.replaceJailCard(this.freejail)
+      this.freeJail = null
+      return
+    }
     this.position = 11
     this.inJail = true
     ipcRenderer.send("goJail")
@@ -377,6 +519,10 @@ class Player {
 
   setPosition(pos){
     this.position = pos
+  }
+
+  getThePosition(){
+    return this.position
   }
 
 

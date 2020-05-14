@@ -5,8 +5,8 @@ var buyWindow;
 var jailWindow;
 var upgradeWindow;
 var auctionWindow;
+var choiceWindow;
 function createWindow () {
-  // Create the browser window.
   win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -58,6 +58,19 @@ ipcMain.on("letAuction", (e,auctionInfo) => {
 ipcMain.on("auctionPurchase",(e,aucInfo) => {
   auctionWindow.close()
   win.webContents.send("auctionPurchaseRen", aucInfo)
+})
+
+ipcMain.on("giveChoices", (e,choices) => {
+  dialog.showMessageBox({
+  type: 'info',
+  title: 'Pot Luck Choice',
+  message: choices[0],
+  defaultId: 0,
+  cancelId: 0,
+  buttons: choices[1]
+}, (buttonIndex) => {
+  win.webContents.send("actionChoiceRen", choices[1][buttonIndex])
+});
 })
 
 ipcMain.on("offerUpgrades",(e,propertiesInfo) => {
