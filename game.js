@@ -475,6 +475,26 @@ class Player {
     parkingFinesMoney = 0;
   }
 
+  getNumOfStations(){
+    let count = 0;
+    for(let prop of this.properties){
+      if(prop.type == "Station"){
+        count++
+      }
+    }
+    return count
+  }
+
+  getNumOfUtils(){
+    let count = 0;
+    for(let prop of this.properties){
+      if(prop.type == "Utilities"){
+        count++
+      }
+    }
+    return count
+  }
+
   async goToJail(){
     this.position = 11
     if(this.freeJail != null){
