@@ -6,6 +6,7 @@ var jailWindow;
 var upgradeWindow;
 var auctionWindow;
 var choiceWindow;
+var raiseWindow;
 function createWindow () {
   win = new BrowserWindow({
     width: 800,
@@ -53,6 +54,25 @@ ipcMain.on("letAuction", (e,auctionInfo) => {
   auctionWindow.webContents.on("did-finish-load", () => {
     auctionWindow.webContents.send("loadAuctionData", auctionInfo)
   })
+})
+
+ipcMain.on("letRaise", (e,raiseData) => {
+  raiseWindow = new BrowserWindow({
+    width:300,
+    height:400,
+    webPreferences:{
+      nodeIntegration:true
+    }
+  })
+  raiseWindow.loadFile("raiseFunds.html")
+  raiseWindow.webContents.on("did-finish-load", () => {
+    raiseWindow.webContents.send("sellOptions",raiseData)
+  })
+})
+
+ipcMain.on("sellOptionsChoose", (e,data) => {
+  raiseWindow.close()
+  win.webContents.send("sellOptionsChooseRen", data)
 })
 
 ipcMain.on("auctionPurchase",(e,aucInfo) => {
