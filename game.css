@@ -1,10 +1,15 @@
 body{
   font-family: 'Comic Neue';
-  background-color: #21bf73;
+  background-color: #21bf73
 }
 
 p{
   margin: 0;
+}
+
+.icon{
+  width: 15px;
+  margin-right: 2px;
 }
 
 .footer{
@@ -56,6 +61,14 @@ p{
 
 #rollDiceBtn:hover{
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+#gameStats{
+  margin-bottom: 10px;
+}
+
+#currentPlayerProperties{
+  padding: 0;
 }
 
 #playerNamesVisual{
