@@ -6,11 +6,10 @@ var jailWindow;
 var upgradeWindow;
 var auctionWindow;
 var choiceWindow;
-var raiseWindow;
 function createWindow () {
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 640,
+    height: 860,
     webPreferences: {
       nodeIntegration: true
     }
@@ -30,8 +29,8 @@ ipcMain.on("getPlayers", (e, args) => {
 
 ipcMain.on("letBuy", (e,tile) => {
   buyWindow = new BrowserWindow({
-    width:300,
-    height:400,
+    width: 320,
+    height: 540,
     webPreferences:{
       nodeIntegration:true
     }
@@ -44,8 +43,8 @@ ipcMain.on("letBuy", (e,tile) => {
 
 ipcMain.on("letAuction", (e,auctionInfo) => {
   auctionWindow = new BrowserWindow({
-    width:300,
-    height:400,
+    width: 550,
+    height: 610,
     webPreferences:{
       nodeIntegration:true
     }
@@ -54,25 +53,6 @@ ipcMain.on("letAuction", (e,auctionInfo) => {
   auctionWindow.webContents.on("did-finish-load", () => {
     auctionWindow.webContents.send("loadAuctionData", auctionInfo)
   })
-})
-
-ipcMain.on("letRaise", (e,raiseData) => {
-  raiseWindow = new BrowserWindow({
-    width:300,
-    height:400,
-    webPreferences:{
-      nodeIntegration:true
-    }
-  })
-  raiseWindow.loadFile("raiseFunds.html")
-  raiseWindow.webContents.on("did-finish-load", () => {
-    raiseWindow.webContents.send("sellOptions",raiseData)
-  })
-})
-
-ipcMain.on("sellOptionsChoose", (e,data) => {
-  raiseWindow.close()
-  win.webContents.send("sellOptionsChooseRen", data)
 })
 
 ipcMain.on("auctionPurchase",(e,aucInfo) => {
@@ -95,8 +75,8 @@ ipcMain.on("giveChoices", (e,choices) => {
 
 ipcMain.on("offerUpgrades",(e,propertiesInfo) => {
   upgradeWindow = new BrowserWindow({
-    width:300,
-    height:400,
+    width:500,
+    height:600,
     webPreferences:{
       nodeIntegration:true
     }
@@ -132,8 +112,8 @@ ipcMain.on("infoMessage",(e,message) => {
 
 ipcMain.on("goJail", (e,args) => {
   jailWindow = new BrowserWindow({
-    width:300,
-    height:400,
+    width:330,
+    height:410,
     webPreferences:{
       nodeIntegration:true
     }

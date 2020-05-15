@@ -1,16 +1,45 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-      <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
-      <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-      <script>if (window.module) module = window.module;</script>
 
-    <title>Property Tycoon</title>
-  </head>
-  <body>
-    <span>You have been put in jail, would you like to pay £50 to leave now or miss 2 go's and not collect rent?</span>
-    <button id="leaveJail">Leave Jail</button>
-    <button id="stayJail">I'll Wait</button>
+<head>
+  <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <script>
+    if (window.module) module = window.module;
+  </script>
 
-  </body>
-  <script type="text/javascript" src="jail.js"></script>
+  <title>Property Tycoon by Walton Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="jail.css">
+  <link href='https://fonts.googleapis.com/css?family=Comic Neue' rel='stylesheet'>
+
+</head>
+
+<body>
+  <div class="text-center" id="jailBody">
+    <img id="jailImg" src="security.png" alt="Jail bars">
+    <div class="text-center" id="jailText">
+      <span>You have been put in jail!<br> Would you like to pay £50 to leave now or miss 2 go's and not collect rent?</span>
+    </div>
+    <div class="text-center" id="jailBtns">
+      <button class="btn btn-success"id="leaveJail">Leave Jail</button>
+      <button class="btn btn-danger"id="stayJail">I'll Wait</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© Walton Games 2020, Property Tycoon™</p>
+  </div>
+
+</body>
+<script type="text/javascript" src="jail.js"></script>
+
+</html>

@@ -1,0 +1,97 @@
+body{
+  background-color: #21bf73;
+}
+
+p{
+  margin: 0;
+}
+
+.mainBody{
+  font-family: 'Comic Neue';
+  font-weight: bold;
+}
+
+.player1{
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.player2{
+  padding-bottom: 10px;
+}
+
+.player3{
+  padding-bottom: 10px;
+}
+
+.player4{
+  padding-bottom: 10px;
+}
+
+.player5{
+  padding-bottom: 10px;
+}
+
+.player6{
+  padding-bottom: 10px;
+}
+
+.playerNames{
+  border: 2px solid #527318;
+  border-radius: 4px;
+}
+
+.footer{
+  background-color: #fd5e53;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 20px;
+}
+
+#gameLogo{
+  background-color: #fd5e53;
+}
+
+#logo{
+  display: block;
+  max-width: 35%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#numOfPlayersText{
+  color: black;
+  font-size: 20px;
+  padding-top: 5px;
+  margin-bottom: 0;
+}
+
+#numOfPlayersSelector{
+  width: 55px;
+  height: 35px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  border: 2px solid #527318;
+}
+
+#startGameBtn{
+  color: white;
+  background-color: #fd5e53;
+  border: 2px solid black;
+  border-radius: 20px;
+  transition-duration: 0.3s;
+  margin-bottom: 100px;
+}
+
+#startGameBtn:hover{
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}

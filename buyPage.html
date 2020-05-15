@@ -1,24 +1,52 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-      <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
-      <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-      <script>if (window.module) module = window.module;</script>
 
-    <title>Property Tycoon</title>
-  </head>
-  <body>
-    <div id="buyMessage"></div>
-    <ul>
+<head>
+  <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <script>
+    if (window.module) module = window.module;
+  </script>
+
+  <title>Property Tycoon by Walton Games</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="buyPage.css">
+  <link href='https://fonts.googleapis.com/css?family=Comic Neue' rel='stylesheet'>
+
+</head>
+
+<body>
+  <div class="propertyCard">
+  <div class="text-center" id="buyMessage"></div>
+  <ul>
     <li id="houseName"></li>
     <li id="houseType"></li>
     <li id="houseCost"></li>
     <li id="houseRent"></li>
     <li id="upgradeCost"></li>
     <div id="houseUpgrades"></div>
-    </ul>
-    <button id="buyHouse">Buy Property</button>
-    <button id="rejectHouse">No Thanks</button>
+  </ul>
+  <div class="text-center" id="purchaseBtns">
+    <button class="btn btn-success" id="buyHouse">Buy Property</button>
+    <button class="btn btn-danger" id="rejectHouse">No Thanks</button>
+  </div>
+  <div class="text-center" id="cardFooter">
+    <p>© Walton Games 2020, Property Tycoon™</p>
+  </div>
+</div>
 
-  </body>
-  <script type="text/javascript" src="buyPage.js"></script>
+</body>
+<script type="text/javascript" src="buyPage.js"></script>
+
+</html>

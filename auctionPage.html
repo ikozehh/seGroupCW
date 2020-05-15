@@ -1,26 +1,59 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
 
-      <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-      <script>if (window.module) module = window.module;</script>
+<head>
 
-    <title>Property Tycoon</title>
-  </head>
-  <body>
-    <div id="buyMessage"></div>
-    <ul>
-    <li id="houseName"></li>
-    <li id="houseType"></li>
-    <li id="houseCost"></li>
-    <li id="houseRent"></li>
-    <li id="upgradeCost"></li>
-    <div id="houseUpgrades"></div>
-    </ul>
-    <div id="inputOptions">
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <script>
+    if (window.module) module = window.module;
+  </script>
+
+  <title>Property Tycoon by Walton Games</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="auctionPage.css">
+  <link href='https://fonts.googleapis.com/css?family=Comic Neue' rel='stylesheet'>
+
+</head>
+
+<body>
+  <div id="auctionMain">
+    <div class="text-center" id="header">
+      <div class="text-center">
+        <img id="auctionImg" src="hammer.png" alt="Auction hammer">
       </div>
-    <button id="placeBidsBtn">Place Bids</button>
+      <div class="text-center" id="buyMessage"></div>
+    </div>
+    <ul>
+      <li id="houseName"></li>
+      <li id="houseType"></li>
+      <li id="houseCost"></li>
+      <li id="houseRent"></li>
+      <li id="upgradeCost"></li>
+      <div id="houseUpgrades"></div>
+    </ul>
+    <div class="text-center" id="inputOptions">
+    </div>
+    <div class="text-center">
+      <button class="btn" id="placeBidsBtn">Place Bids</button>
+    </div>
+  </div>
 
+  <div class="footer">
+    <p>© Walton Games 2020, Property Tycoon™</p>
+  </div>
 
-  </body>
-  <script type="text/javascript" src="auctionPage.js"></script>
+</body>
+<script type="text/javascript" src="auctionPage.js"></script>
+
+</html>

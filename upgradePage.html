@@ -1,18 +1,53 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-      <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
-      <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-      <script>if (window.module) module = window.module;</script>
 
-    <title>Property Tycoon</title>
-  </head>
-  <body>
-    <span>You have upgrades available for properties that you own</span>
-    <ul id="houseList">
+<head>
+  <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <script>
+    if (window.module) module = window.module;
+  </script>
+
+  <title>Property Tycoon by Walton Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="upgrades.css">
+  <link href='https://fonts.googleapis.com/css?family=Comic Neue' rel='stylesheet'>
+
+</head>
+
+<body>
+  <div id="upgradesMain">
+    <div class="text-center" id="upgradesHead">
+      <div class="text-center">
+        <img id="upgradesImg" src="build.png" alt="Building tools">
+      </div>
+      <div class="text-center" id="upgradesText">
+        <span>You have upgrades available for properties that you own!</span>
+      </div>
+    </div>
+    <div id="upgradesList">
+      <ul id="houseList" style="list-style-type: none">
       </ul>
-    <button id="buyUpgradesBtn">Buy Upgrades</button>
-    <button id="rejectUpgradesBtn">No Thanks</button>
+    </div>
+    <div class="text-center" id="upgradesBtns">
+      <button class="btn btn-success" id="buyUpgradesBtn">Buy Upgrades</button>
+      <button class="btn btn-danger" id="rejectUpgradesBtn">No Thanks</button>
+    </div>
+  </div>
 
-  </body>
-  <script type="text/javascript" src="houseUpgrades.js"></script>
+  <div class="footer">
+    <p>© Walton Games 2020, Property Tycoon™</p>
+  </div>
+
+</body>
+<script type="text/javascript" src="houseUpgrades.js"></script>
+
+</html>
