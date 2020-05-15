@@ -46,7 +46,6 @@ ipcRenderer.on("sendPlayersInitGame", function(e, args){
   let sortedBoard = sort(listOfTiles).asc(u => u.position)
   console.log(sortedBoard)
   boardGame = new Board(listOfPlayers, sortedBoard)
-  updateBoardVisual(boardGame)
   console.log(boardGame)
 
   let rollDiceBtn = document.getElementById("rollDiceBtn")
@@ -68,7 +67,6 @@ class Board {
     this.numOfPlayers = players.length
     this.tiles = tiles
     console.log(this.tiles)
-
   }
 
   // get currentPlayer(){
@@ -85,34 +83,22 @@ class Board {
     this.currentPlayer = this.players[this.currentPlayerNum]
     console.log(this)
     this.currentPlayer.setIsTurn(true)
-    updateBoardVisual(this)
-
-  }
-
-  getGame(){
-    return this
   }
 
   async rollDiceMovePlayer(){
-
     if(this.currentPlayer.isInJail()){
       this.currentPlayer.incrementMissedRoundsAndHandleJail();
       this.updateCurrentPlayer()
       return
     }
     let diceRoll = this.currentPlayer.rollDice()
-
     let diceResult = diceRoll["roll"]
-    updateDiceResult(diceResult)
     if(diceRoll["isDouble"]){
       if(this.currentPlayer.getNumDoubles() == 3){
-        ipcRenderer.send("infoMessage","You have rolled too many doubles in a row, you are going to jail!")
         await this.currentPlayer.goToJail()
         this.currentPlayer.setNumDoubles(0)
         this.updateCurrentPlayer()
         return
-      }else{
-        ipcRenderer.send("infoMessage","You have just rolled a double, you get another go")
       }
     }
     let newPosition = this.currentPlayer.updatePosition(diceResult)
@@ -128,7 +114,7 @@ class Board {
           })
         })
         if(buyHouse){
-          await this.tiles[newPosition - 1].buy(this.currentPlayer, null)
+          this.tiles[newPosition - 1].buy(this.currentPlayer)
           console.log("buy the house")
         }else{
           console.log("dont buy")
@@ -138,7 +124,7 @@ class Board {
               res(buy)
             })
           })
-          await this.handleAuctionRes(auctionHouse)
+          //await this.handleAuctionRes(auctionHouse)
         }
       }
     }else{
@@ -163,31 +149,6 @@ class Board {
     }
 
 
-  }
-
-  removePlayer(player){
-    for(let i=0;i<this.players.length;i++){
-      if(this.players[i] == player){
-        this.players.splice(i,1)
-        break;
-      }
-    }
-    updatePlayerList()
-  }
-
-  async handleAuctionRes(auctionData){
-    let highestBid = auctionData[1]
-    if(highestBid == 0){
-      ipcRenderer.send("infoMessage", "No one has bid, the property will not be sold")
-      return
-    }
-    let auctionWinner = auctionData[0]
-    for(let person of this.players){
-      if(person.name == auctionWinner){
-        await this.tiles[newPosition - 1].buy(person, highestBid)
-        break
-      }
-    }
   }
 
   replaceJailCard(type){
@@ -249,7 +210,6 @@ class Board {
         await this.takeCard("Pot Luck")
       }
     }
-    updateBoardVisual(this)
   }
 
   async takeCard(typeOfCard){
@@ -382,78 +342,16 @@ class Player {
     return total
   }
 
-  async spendMoney(amount){
+  spendMoney(amount){
     console.log("Player " + this.name + " is spending " + amount)
-    if(this.money - amount < 0 && this.properties.length ==0){
-      ipcRenderer.send("infoMessage", "You have now become bankrupt "+this.name+", you have quit the game")
-      this.money = 0;
-      boardGame.removePlayer(this)
-    }else if(this.money - amount < 0 && this.properties.length > 0){
-      await this.raiseFunds(amount)
-    }else{
-      this.money = this.money - amount
-      console.log("Spent money, money left: " + this.money)
-    }
-    updateBoardVisual(boardGame.getGame())
-
-  }
-
-  async raiseFunds(amount){
-    ipcRenderer.send("letRaise", this.properties)
-    let promise = await new Promise((res,rej) => {
-      while(this.money < 0 + amount && this.properties.length > 0){
-        let fundsRaising = await new Promise((res,rej) => {
-          ipcRenderer.once("sellOptionsChooseRen",(e,data) => {
-            res(data)
-          })
-        })
-        let removeEls = []
-        for (let property of this.properties){
-          if(fundsRaising[property.name] && fundsRaising[property.name] != 0){
-            if(fundsRaising[property.name] == property.numOfHouses + 1){
-              this.receiveMoney(property.cost)
-              bankMoney = bankMoney - property.cost
-              this.receiveMoney(property.numOfHouses * property.getHouseCost())
-              bankMoney = bankMoney - (property.numOfHouses * property.getHouseCost())
-              property.resetData()
-              for(let i=0; i<this.properties.length;i++){
-                if(this.properties[i] == property){
-                  removeEls.push(i)
-                }
-              }
-            }else if(fundsRaising[property.name] == 1 && property.numOfHouses == 0){
-              this.receiveMoney(property.cost)
-              bankMoney = bankMoney - property.cost
-              property.resetData()
-              for(let i=0; i<this.properties.length;i++){
-                if(this.properties[i] == property){
-                  removeEls.push(i)
-                }
-              }
-            }else{
-              this.receiveMoney(fundsRaising[property.name] * property.getHouseCost())
-              bankMoney = bankMoney - (fundsRaising[property.name] * property.getHouseCost())
-            }
-          }
-        }
-        for(let i =removeEls.length -1;i >= 0;i--){
-          this.properties.splice(i,1)
-        }
-      }
-
-    })
-    promise.then(await this.spendMoney(amount))
-
-
-
-
+    this.money = this.money - amount
+    console.log("Spent money, money left: " + this.money)
   }
 
   receiveMoney(amount){
     console.log("Player " + this.name + " is receiving " + amount)
     this.money = this.money + amount
     console.log("Received money, money left: " + this.money)
-    updateBoardVisual(boardGame.getGame())
 
   }
 
@@ -564,7 +462,7 @@ class Player {
     }else{
       for(let property of this.properties){
         if(property.getName() in choices){
-          property.buy(this, null)
+          property.buy(this)
         }
       }
     }
@@ -575,26 +473,6 @@ class Player {
     this.receiveMoney(parkingFinesMoney)
     ipcRenderer.send("infoMessage", "You have collected all the parking fines money which was £ "+parkingFinesMoney)
     parkingFinesMoney = 0;
-  }
-
-  getNumOfStations(){
-    let count = 0;
-    for(let prop of this.properties){
-      if(prop.type == "Station"){
-        count++
-      }
-    }
-    return count
-  }
-
-  getNumOfUtils(){
-    let count = 0;
-    for(let prop of this.properties){
-      if(prop.type == "Utilities"){
-        count++
-      }
-    }
-    return count
   }
 
   async goToJail(){
@@ -724,12 +602,6 @@ class Tile{
     this.rent = rent;
     this.houses = houses;
     this.numOfHouses = -1
-  }
-
-  resetData(){
-    this.numOfHouses = -1
-    this.isOwned = false
-    this.owner = null
   }
 
   shouldRentDouble(){
@@ -863,7 +735,6 @@ class Tile{
       player.spendMoney(this.rent)
       this.owner.receiveMoney(this.rent)
     }
-    updateBoardVisual(boardGame.getGame());
     // else{
     //   if(this.action == "Pay"){
     //     player.spendMoney(this.rent)
@@ -873,23 +744,20 @@ class Tile{
 
   }
 
-  async buy(player, amount){
-    if(amount == null){
-      amount = this.cost
-    }
+  buy(player){
     if(this.owner != player){
-      if (player.getMoney() >= amount){
+      if (player.getMoney() >= this.cost){
         console.log("Buying new property")
           this.owner = player
-          player.spendMoney(amount)
-          bankMoney = bankMoney + amount
+          player.spendMoney(this.cost)
+          bankMoney = bankMoney + this.cost
           if(this.type != "Station" && this.type != "Utilities"){
             this.numOfHouses++
           }
           player.addNewProperty(this)
           ipcRenderer.send("sendInfo", "You have bought the property")
       }else{
-        ipcRenderer.send("infoMessage", "You do not have enough money to buy that " + player.name)
+        console.log("Not enough money")
       }
     }else{
       if(player.getMoney() >= this.getHouseCost()){
@@ -904,62 +772,10 @@ class Tile{
         }
 
       }else{
-        ipcRenderer.send("infoMessage", "You do not have enough money to buy that " + player.name)
+        console.log("Not enough money")
       }
 
     }
-    updateBoardVisual(boardGame.getGame())
 
   }
-}
-
-function updateBoardVisual(board){
-  let playerNameSpan = document.getElementById("currentTurn")
-  let playerMoneySpan = document.getElementById("playerMoney")
-  let playerPositionSpan = document.getElementById("playerPosition")
-  let propsList = document.getElementById("currentPlayerProperties")
-  propsList.innerHTML = ""
-  //document.getElementById("diceRoll").innerText = "Dice Roll: "
-  document.getElementById("playerMoney").innerText = "Players Money: "+board.currentPlayer.money
-  playerNameSpan.innerText ="Current Player: "+ board.currentPlayer.name
-  playerMoneySpan.innerText = "Players Money: " + board.currentPlayer.money
-  playerPositionSpan.innerText = "Player Position: " + board.currentPlayer.position
-  for(let prop of board.currentPlayer.properties){
-    let listEl = document.createElement("li")
-    listEl.innerText = prop.name + "- type: "+prop.type
-    propsList.appendChild(listEl)
-  }
-
-}
-
-// function updateMoney(){
-//   document.getElementById("playerMoney").innerText = "Players Money: "+boardGame.currentPlayer.money
-//   let playerNameSpan = document.getElementById("currentTurn")
-//   let playerMoneySpan = document.getElementById("playerMoney")
-//   let playerPositionSpan = document.getElementById("playerPosition")
-//   let propsList = document.getElementById("currentPlayerProperties")
-//   //document.getElementById("diceRoll").innerText = "Dice Roll: "
-//   playerNameSpan.innerText ="Current Player: "+ boardGame.currentPlayer.name
-//   playerMoneySpan.innerText = "Players Money: " + boardGame.currentPlayer.money
-//   playerPositionSpan.innerText = "Player Position: " + boardGame.currentPlayer.position
-//   for(let prop of boardGame.currentPlayer.properties){
-//     let listEl = document.createElement("li")
-//     listEl.innerText = prop.name + "- type: "+prop.type
-//     propsList.appendChild(listEl)
-//   }
-// }
-
-function updatePlayerList(){
-  let list = document.getElementById("playerNamesVisual")
-  list.innerHTML = ""
-  for(let person of boardGame.players){
-    let li = document.createElement("li")
-    li.innerText = person.name
-    li.appendChild(list)
-  }
-}
-
-function updateDiceResult(result){
-  let diceSpan = document.getElementById("diceRoll")
-  diceSpan.innerText = "Dice Roll: "+result
 }

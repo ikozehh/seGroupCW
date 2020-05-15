@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-      <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
-      <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-      <script>if (window.module) module = window.module;</script>
 
-    <title>Walton Games</title>
-  </head>
-  <body>
-    <div>
-      <label for="numOfPlayersSelector">Choose Number of Players</label>
-      <select id="numOfPlayersSelector">
+<head>
+  <!--- <link type"text/css" href="./mainWindow.css" rel="stylesheet"> --->
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <script>
+    if (window.module) module = window.module;
+  </script>
+
+  <title>Property Tycoon by Walton Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="setup.css">
+  <link href='https://fonts.googleapis.com/css?family=Comic Neue' rel='stylesheet'>
+
+</head>
+
+<body>
+  <div class="mainBody">
+    <div id="gameLogo">
+      <img id="logo" src="images/logo2.png" alt="Property Tycoon Logo">
+    </div>
+    <div class="text-center">
+      <label id="numOfPlayersText" class="container-fluid bg" for="numOfPlayersSelector">Choose Number of Players</label>
+      <select class="custom-select" id="numOfPlayersSelector">
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">4</option>
@@ -19,8 +39,8 @@
       </select>
 
       <div class="player1">
-        <input class="playerNames" type="text" id="player1Name" placeholder="player1">
         <label for="player1Name">Player 1 Name</label>
+        <input class="playerNames" type="text" id="player1Name" placeholder="player1">
         <div class="playerTokenOpts" id="p1TokenChoose">
           <input type="radio" id="p1t1" name="p1t" value="boot">
           <label for="p1t1">Boot</label>
@@ -37,8 +57,8 @@
         </div>
       </div>
       <div class="player2">
-        <input class="playerNames" type="text" id="player2Name" placeholder="player2">
         <label for="player2Name">Player 2 Name</label>
+        <input class="playerNames" type="text" id="player2Name" placeholder="player2">
         <div class="playerTokenOpts" id="p2TokenChoose">
           <input type="radio" id="p2t1" name="p2t" value="boot">
           <label for="p2t1">Boot</label>
@@ -55,8 +75,8 @@
         </div>
       </div>
       <div class="player3" hidden="true">
-        <input class="playerNames" type="text" id="player3Name" placeholder="player3">
         <label for="player3Name">Player 3 Name</label>
+        <input class="playerNames" type="text" id="player3Name" placeholder="player3">
         <div class="playerTokenOpts" id="p3TokenChoose">
           <input type="radio" id="p3t1" name="p3t" value="boot">
           <label for="p3t1">Boot</label>
@@ -73,8 +93,8 @@
         </div>
       </div>
       <div class="player4" hidden="true">
-        <input class="playerNames" type="text" id="player4Name" placeholder="player4">
         <label for="player4Name">Player 4 Name</label>
+        <input class="playerNames" type="text" id="player4Name" placeholder="player4">
         <div class="playerTokenOpts" id="p4TokenChoose">
           <input type="radio" id="p4t1" name="p4t" value="boot">
           <label for="p4t1">Boot</label>
@@ -91,8 +111,8 @@
         </div>
       </div>
       <div class="player5" hidden="true">
-        <input class="playerNames" type="text" id="player5Name" placeholder="player5">
         <label for="player5Name">Player 5 Name</label>
+        <input class="playerNames" type="text" id="player5Name" placeholder="player5">
         <div class="playerTokenOpts" id="p5TokenChoose">
           <input type="radio" id="p5t1" name="p5t" value="boot">
           <label for="p5t1">Boot</label>
@@ -109,8 +129,8 @@
         </div>
       </div>
       <div class="player6" hidden="true">
-        <input class="playerNames" type="text" id="player6Name" placeholder="player6">
         <label for="player6Name">Player 6 Name</label>
+        <input class="playerNames" type="text" id="player6Name" placeholder="player6">        
         <div class="playerTokenOpts" id="p6TokenChoose">
           <input type="radio" id="p6t1" name="p6t" value="boot">
           <label for="p6t1">Boot</label>
@@ -127,7 +147,17 @@
         </div>
       </div>
     </div>
-    <button id="startGameBtn">Start Game</button>
-  </body>
-  <script type="text/javascript" src="setupController.js"></script>
-  
+
+  </div>
+  <div class="text-center">
+    <button id="startGameBtn" class="btn">Start Game</button>
+  </div>
+
+  <div class="footer">
+    <p>© Walton Games 2020, Property Tycoon™</p>
+  </div>
+
+</body>
+<script type="text/javascript" src="setupController.js"></script>
+
+</html>
