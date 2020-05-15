@@ -400,7 +400,7 @@ class Player {
 
   async raiseFunds(amount){
     ipcRenderer.send("letRaise", this.properties)
-    let promise = await new Promise((res,rej) => {
+    let promise = await new Promise(async (res,rej) => {
       while(this.money < 0 + amount && this.properties.length > 0){
         let fundsRaising = await new Promise((res,rej) => {
           ipcRenderer.once("sellOptionsChooseRen",(e,data) => {
